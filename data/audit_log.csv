@@ -1,0 +1,11 @@
+Case_ID,Original_Note,Detected_Ambiguity,Recommendation,Human_Decision,Override_Reason,Timestamp
+CASE-1001,Follow-up appointment scheduled for 15 September.,NONE,Proceed with standard patient discharge workflow.,CONFIRM,NONE,2026-09-07 11:30:55
+CASE-1001,Follow-up appointment scheduled for 15 September.,NONE,Proceed with standard patient discharge workflow.,CONFIRM,NONE,2026-09-07 11:31:00
+CASE-1001,Follow-up appointment scheduled for 15 September.,NONE,Proceed with standard patient discharge workflow.,CONFIRM,NONE,2026-09-07 11:31:00
+DEMO-002,Review the patient later.,FOLLOWUP_TIME_MISSING,Confirm specific follow-up interval with clinician before discharge.,CONFIRM,NONE,2026-09-07 11:42:29
+DEMO-003,Continue treatment for some time.,VAGUE_DURATION,Specify clear end date or exact day count for medication.,CONFIRM,NONE,2026-09-07 11:43:45
+DEMO-003,Continue treatment for some time.,VAGUE_DURATION,Specify clear end date or exact day count for medication.,MODIFY,Already addressed,2026-09-07 11:43:50
+DEMO-003,Continue treatment for some time.,VAGUE_DURATION,Specify clear end date or exact day count for medication.,MODIFY,Patient preference,2026-09-07 11:43:54
+DEMO-003,Continue treatment for some time.,VAGUE_DURATION,Specify clear end date or exact day count for medication.,REJECT,False positive,2026-09-07 11:44:00
+DEMO-003,Continue treatment for some time.,VAGUE_DURATION,Specify clear end date or exact day count for medication.,ESCALATE,NONE,2026-09-07 11:44:04
+DEMO-005,follw up aftr 3 dys if condtion worsn,NOISY_NOTE,Human clinician confirmation required to verify intended words.,CONFIRM,NONE,2026-09-07 11:44:13
