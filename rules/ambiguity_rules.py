@@ -73,12 +73,121 @@ class BaselineAmbiguityDetector:
         }
 
 
+class DirectMultilingualClinicalLexicon:
+    """
+    Direct Multilingual Clinical Lexicon (DMCL) Pre-processor.
+    Provides canonical semantic mapping for regional languages (Hindi, Tamil, Telugu,
+    and Romanized code-mixed vernacular such as Hinglish and Tanglish) to normalized
+    clinical English primitives.
+    """
+    def __init__(self):
+        # Bi-directional mapping of regional symptom phrases to canonical English terms
+        self.multilingual_symptom_map = {
+            # Hindi (Devanagari & Romanized Hinglish)
+            "सांस लेने में तकलीफ": "worsening breathing difficulty",
+            "saans lene me dikkat": "worsening breathing difficulty",
+            "saans lene me pareshani": "worsening breathing difficulty",
+            "छाती में दर्द": "chest pain",
+            "chhati me dard": "chest pain",
+            "seene me dard": "chest pain",
+            "seene me dabav": "chest pressure",
+            "छाती में भारीपन": "chest pressure",
+            "tez bukhar": "high fever",
+            "gale me jakdan": "neck stiffness",
+            "gardhan me jakdan": "neck stiffness",
+
+            # Tamil (Tamil script & Romanized Tanglish)
+            "சுவாச பிரச்சனை": "worsening breathing difficulty",
+            "swasa kashtam": "worsening breathing difficulty",
+            "மூச்சு திணறல்": "worsening breathing difficulty",
+            "moochu thinaral": "worsening breathing difficulty",
+            "நெஞ்சு வலி": "chest pain",
+            "nenju vali": "chest pain",
+            "நெஞ்சு அழுத்தம்": "chest pressure",
+            "nenju azhutham": "chest pressure",
+            "kodu jwaram": "high fever",
+            "thondai vali": "neck stiffness",
+
+            # Telugu (Telugu script & Romanized Telugu)
+            "శ్వాస తీసుకోవడంలో ఇబ్బంది": "worsening breathing difficulty",
+            "swasa teesukovadam lo ibbandi": "worsening breathing difficulty",
+            "గుండె నొప్పి": "chest pain",
+            "gunde noppi": "chest pain",
+            "ఛాతీలో ఒత్తిడి": "chest pressure",
+            "teevramaina jwaram": "high fever",
+        }
+
+        # Mapping of regional temporal and delay phrases
+        self.multilingual_temporal_map = {
+            # Hindi
+            "बाद में": "later",
+            "baad me": "later",
+            "बाद में दिखाएं": "review later",
+            "baad me dikhaye": "review later",
+            "baad me aana": "review later",
+            "kuch din baad": "after some time",
+            "agle hafte": "next week",
+            "zarurat padne par": "if necessary",
+            "agar halat kharab ho": "if symptoms get worse",
+            "agar tabiyat bigad jaye": "if symptoms get worse",
+            "kuch samay tak": "for some time",
+
+            # Tamil
+            "அப்புறம்": "later",
+            "appram": "later",
+            "அப்புறம் பார்க்கலாம்": "review later",
+            "appram paakkalaam": "review later",
+            "pinbu paarkkavum": "review later",
+            "sila naatkal kazhithu": "after some time",
+            "adutha vaaram": "next week",
+            "thevaippattaal": "if necessary",
+            "nilai mosamaanall": "if symptoms get worse",
+            "sila kaalamaga": "for some time",
+            "kazhithu": "after",
+
+            # Telugu
+            "తరువాత": "later",
+            "taruvata": "later",
+            "తరువాత చూడండి": "review later",
+            "taruvata chudandi": "review later",
+            "konni rojulaku": "after some time",
+            "vache vaaram": "next week",
+            "avasaramaithe": "if necessary",
+            "paristhithi cheddadithe": "if symptoms get worse",
+            "kontha kaalam": "for some time",
+        }
+
+    def normalize(self, text: str) -> str:
+        """
+        Normalizes regional language and code-mixed clinical text into standardized
+        canonical English clinical tokens while preserving original structure.
+        """
+        if not text:
+            return ""
+        normalized = text.lower()
+        
+        # Replace regional symptom expressions
+        for reg_phrase, canonical in self.multilingual_symptom_map.items():
+            if reg_phrase.lower() in normalized:
+                normalized = normalized.replace(reg_phrase.lower(), canonical)
+                
+        # Replace regional temporal and delay expressions
+        for reg_phrase, canonical in self.multilingual_temporal_map.items():
+            if reg_phrase.lower() in normalized:
+                normalized = normalized.replace(reg_phrase.lower(), canonical)
+                
+        return normalized
+
+
 class ProposedAmbiguityAssistant:
     """
     Proposed Explainable Clinical Note Clarification Assistant.
     Provides structured, transparent decision support with confidence & evidence.
     """
     def __init__(self):
+        # Multilingual Clinical Lexicon Pre-processor
+        self.multilingual_lexicon = DirectMultilingualClinicalLexicon()
+
         # Urgent symptom indicators
         self.urgent_symptoms = [
             "worsening breathing difficulty", "breathing difficulty", "dyspnea",
@@ -138,7 +247,9 @@ class ProposedAmbiguityAssistant:
                 "uncertainty_warning": "Unable to safely assess the case because the clinical note is missing. Manual review is required."
             }
 
-        note_lower = clinical_note.lower()
+        # Normalize regional and code-mixed input via the Multilingual Lexicon Pre-processor
+        normalized_note = self.multilingual_lexicon.normalize(clinical_note)
+        note_lower = normalized_note.lower()
 
         # Check 1: Urgent Escalation Conflict (Category H)
         for surg in self.urgent_symptoms:
